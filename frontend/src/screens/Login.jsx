@@ -1,5 +1,3 @@
-"use client"
-
 import { MapPin, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react"
 import { useState } from "react"
 
