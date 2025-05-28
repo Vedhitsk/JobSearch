@@ -1,6 +1,17 @@
-import { Bookmark, BookmarkIcon as BookmarkFilled, Edit } from "lucide-react";
+import {
+  Bookmark,
+  BookmarkIcon as BookmarkFilled,
+  Edit,
+  Trash2,
+} from "lucide-react";
 
-const JobCard = ({ job, colorIndex = 0, onEdit, onDetails }) => {
+const JobCard = ({
+  job,
+  colorIndex = 0,
+  onEdit,
+  onDetails,
+  onDelete,
+}) => {
   // Use job prop if provided, otherwise fallback to hardcoded data
   const jobData = job || {
     postedDate: "20 May, 2023",
@@ -26,16 +37,30 @@ const JobCard = ({ job, colorIndex = 0, onEdit, onDetails }) => {
 
   return (
     <div className={`${cardBgColor} rounded-lg p-4 relative`}>
-      {/* Edit button - always visible */}
-      {onEdit && (
-        <button
-          onClick={onEdit}
-          className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-md hover:bg-gray-100 transition-colors duration-200 z-10"
-          title="Edit job"
-        >
-          <Edit className="w-4 h-4" />
-        </button>
-      )}
+      {/* Action buttons container */}
+      <div className="absolute top-2 right-2 flex space-x-1 z-10">
+        {/* Edit button */}
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            className="bg-white rounded-full p-1.5 shadow-md hover:bg-gray-100 transition-colors duration-200"
+            title="Edit job"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Delete button */}
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="bg-white rounded-full p-1.5 shadow-md hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+            title="Delete job"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
       <div className="flex justify-between mb-4">
         <span className="text-sm">{jobData.postedDate}</span>

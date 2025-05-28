@@ -19,9 +19,9 @@ import PostJobPopup from "../components/PostJobPopup";
 import JobCard from "../components/JobCard";
 import JobDetailsPopup from "../components/JobDetailsPopup";
 import EditJobPopup from "../components/EditJobPopup";
+import DeleteConfirmationPopup from "../components/DeleteConfirmationPopup";
 
 export default function Dashboard() {
-
 
   // Convert jobListings to state for dynamic updates
   const [jobListings, setJobListings] = useState([
@@ -112,57 +112,46 @@ export default function Dashboard() {
   ]);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPostJobPopupOpen, setIsPostJobPopupOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
+  const [isEditJobOpen, setIsEditJobOpen] = useState(false);
 
-  // Function to toggle mobile menu
+
+  const [deletingJob, setDeletingJob] = useState(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // State to control popup visibility
-  const [isPostJobPopupOpen, setIsPostJobPopupOpen] = useState(false);
-
-  // Function to open popup
   const openPopup = () => setIsPostJobPopupOpen(true);
-
-  // Function to close popup
   const closePopup = () => setIsPostJobPopupOpen(false);
 
-  // State for job details popup
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
-
-  // State for edit job popup
-  const [editingJob, setEditingJob] = useState(null);
-  const [isEditJobOpen, setIsEditJobOpen] = useState(false);
-
-  // Function to open job details popup
   const openJobDetails = (job) => {
     console.log("Opening job details for:", job.title);
     setSelectedJob(job);
     setIsJobDetailsOpen(true);
   };
 
-  // Function to close job details popup
   const closeJobDetails = () => {
     console.log("Closing job details popup");
     setIsJobDetailsOpen(false);
   };
 
-  // Function to open edit job popup
   const openEditJob = (job) => {
     console.log("Opening edit popup for job:", job.title, "ID:", job.id);
     setEditingJob(job);
     setIsEditJobOpen(true);
   };
 
-  // Function to close edit job popup
   const closeEditJob = () => {
     console.log("Closing edit job popup");
     setIsEditJobOpen(false);
     setEditingJob(null);
   };
 
-  // Function to update a job
   const updateJob = (updatedJob) => {
     console.log("Updating job with ID:", updatedJob.id);
     console.log(
@@ -178,6 +167,32 @@ export default function Dashboard() {
     console.log("Job updated successfully!");
     closeEditJob();
   };
+
+  const openDeleteConfirm = (job) => {
+    console.log("Opening delete confirmation for job:", job.title, "ID:", job.id);
+    setDeletingJob(job);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const closeDeleteConfirm = () => {
+    console.log("Closing delete confirmation popup");
+    setIsDeleteConfirmOpen(false);
+    setDeletingJob(null);
+  };
+
+  const confirmDeleteJob = () => {
+    if (deletingJob) {
+      console.log("Deleting job with ID:", deletingJob.id);
+      console.log("Deleted job data:", deletingJob);
+      
+      setJobListings(jobListings.filter(job => job.id !== deletingJob.id));
+      
+      console.log("Job deleted successfully!");
+      closeDeleteConfirm();
+    }
+  };
+
+  // _____________________________________________
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -204,6 +219,17 @@ export default function Dashboard() {
           isOpen={isEditJobOpen}
           onClose={closeEditJob}
           onUpdate={updateJob}
+        />
+      )}
+
+      {/* New Delete Confirmation Popup */}
+      {deletingJob && (
+        <DeleteConfirmationPopup
+          isOpen={isDeleteConfirmOpen}
+          onClose={closeDeleteConfirm}
+          onConfirm={confirmDeleteJob}
+          jobTitle={deletingJob.title}
+          jobCompany={deletingJob.company}
         />
       )}
 
@@ -460,8 +486,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-
-        {/* Job Listings - Updated to use JobCard component */}
+        {/* Job Listings - Updated to use JobCard component with delete */}
         <div className="w-full md:w-3/4">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
@@ -484,6 +509,7 @@ export default function Dashboard() {
                 colorIndex={index}
                 onEdit={() => openEditJob(job)}
                 onDetails={() => openJobDetails(job)}
+                onDelete={() => openDeleteConfirm(job)}
               />
             ))}
           </div>
