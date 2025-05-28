@@ -39,7 +39,7 @@ const JobDetailsPopup = ({ job, isOpen, onClose }) => {
         <div className={`${job.bgColor} p-6 relative`}>
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-gray-700 hover:text-white hover:bg-gray-800 rounded-full transition-all duration-200"
+            className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
           >
             <X className="w-5 h-5" />
           </button>

@@ -9,15 +9,22 @@ import {
   Bookmark,
   BookmarkIcon as BookmarkFilled,
   SlidersHorizontal,
+  Edit,
+  X,
+  Menu,
 } from "lucide-react";
 import { useState } from "react";
+
 import PostJobPopup from "../components/PostJobPopup";
 import JobCard from "../components/JobCard";
 import JobDetailsPopup from "../components/JobDetailsPopup";
-
+import EditJobPopup from "../components/EditJobPopup";
 
 export default function Dashboard() {
-  const jobListings = [
+
+
+  // Convert jobListings to state for dynamic updates
+  const [jobListings, setJobListings] = useState([
     {
       id: 1,
       postedDate: "20 May, 2023",
@@ -102,7 +109,14 @@ export default function Dashboard() {
       location: "New York, NY",
       bgColor: "bg-gray-100",
     },
-  ];
+  ]);
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Function to toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   // State to control popup visibility
   const [isPostJobPopupOpen, setIsPostJobPopupOpen] = useState(false);
@@ -113,19 +127,56 @@ export default function Dashboard() {
   // Function to close popup
   const closePopup = () => setIsPostJobPopupOpen(false);
 
-  // New state for job details popup
+  // State for job details popup
   const [selectedJob, setSelectedJob] = useState(null);
   const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
 
+  // State for edit job popup
+  const [editingJob, setEditingJob] = useState(null);
+  const [isEditJobOpen, setIsEditJobOpen] = useState(false);
+
   // Function to open job details popup
   const openJobDetails = (job) => {
+    console.log("Opening job details for:", job.title);
     setSelectedJob(job);
     setIsJobDetailsOpen(true);
   };
 
   // Function to close job details popup
   const closeJobDetails = () => {
+    console.log("Closing job details popup");
     setIsJobDetailsOpen(false);
+  };
+
+  // Function to open edit job popup
+  const openEditJob = (job) => {
+    console.log("Opening edit popup for job:", job.title, "ID:", job.id);
+    setEditingJob(job);
+    setIsEditJobOpen(true);
+  };
+
+  // Function to close edit job popup
+  const closeEditJob = () => {
+    console.log("Closing edit job popup");
+    setIsEditJobOpen(false);
+    setEditingJob(null);
+  };
+
+  // Function to update a job
+  const updateJob = (updatedJob) => {
+    console.log("Updating job with ID:", updatedJob.id);
+    console.log(
+      "Previous job data:",
+      jobListings.find((job) => job.id === updatedJob.id)
+    );
+    console.log("Updated job data:", updatedJob);
+
+    setJobListings(
+      jobListings.map((job) => (job.id === updatedJob.id ? updatedJob : job))
+    );
+
+    console.log("Job updated successfully!");
+    closeEditJob();
   };
 
   return (
@@ -146,8 +197,18 @@ export default function Dashboard() {
         />
       )}
 
+      {/* Edit Job Popup */}
+      {editingJob && (
+        <EditJobPopup
+          job={editingJob}
+          isOpen={isEditJobOpen}
+          onClose={closeEditJob}
+          onUpdate={updateJob}
+        />
+      )}
+
       {/* Header */}
-      <header className="bg-black text-white p-4">
+      {/* <header className="bg-black text-white p-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-8">
             <div className="flex items-center">
@@ -164,7 +225,21 @@ export default function Dashboard() {
                 Post a Job
               </button>
             </nav>
+
+            <button
+              className="md:hidden ml-auto mr-4"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
           </div>
+
+          
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center text-sm">
@@ -176,6 +251,93 @@ export default function Dashboard() {
             <Bell className="w-5 h-5" />
           </div>
         </div>
+      </header> */}
+
+      {/* Header */}
+      <header className="bg-black text-white p-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-8">
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-white rounded-full mr-2"></div>
+              <span className="font-bold text-lg">LuckyJob</span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex space-x-6">
+              <p className="border-b-2 border-white py-2 px-4">Find job</p>
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 text-sm"
+                onClick={openPopup}
+              >
+                Post a Job
+              </button>
+            </nav>
+          </div>
+
+          {/* Right side container - Desktop user info and Mobile menu button */}
+          <div className="flex items-center space-x-4">
+            {/* Desktop User Info */}
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="flex items-center text-sm">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span>New York, NY</span>
+              </div>
+              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              <Settings className="w-5 h-5" />
+              <Bell className="w-5 h-5" />
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-gray-700">
+            <nav className="flex flex-col space-y-2 mt-4">
+              <button
+                className="text-left py-2 px-4 hover:bg-gray-800 rounded"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  // Add your Find job navigation logic here
+                }}
+              >
+                Find job
+              </button>
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 text-sm text-left"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  openPopup();
+                }}
+              >
+                Post a Job
+              </button>
+            </nav>
+
+            {/* Mobile User Info */}
+            <div className="flex items-center space-x-4 mt-4 pt-4 border-t border-gray-700">
+              <div className="flex items-center text-sm">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span>New York, NY</span>
+              </div>
+              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              <Settings className="w-5 h-5" />
+              <Bell className="w-5 h-5" />
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Filters */}
@@ -236,16 +398,6 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto p-4 flex flex-col md:flex-row gap-6">
         {/* Left Sidebar */}
         <div className="w-full md:w-1/4">
-          {/* <div className="bg-black text-white rounded-lg overflow-hidden mb-6">
-              <div className="p-6 relative">
-                <div className="absolute inset-0 opacity-20">
-                  <div className="w-full h-full border-t border-l border-white rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-                </div>
-                <h2 className="text-2xl font-bold relative z-10">Get Your best profession with LuckyJob</h2>
-                <button className="mt-6 bg-blue-400 text-white px-4 py-2 rounded-full text-sm">Learn more</button>
-              </div>
-            </div> */}
-
           <div className="bg-white rounded-lg p-4 shadow">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold">Filters</h3>
@@ -308,7 +460,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Job Listings */}
+
+        {/* Job Listings - Updated to use JobCard component */}
         <div className="w-full md:w-3/4">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
@@ -324,50 +477,14 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {jobListings.map((job) => (
-              <div
+            {jobListings.map((job, index) => (
+              <JobCard
                 key={job.id}
-                className={`${job.bgColor} rounded-lg p-4 relative`}
-              >
-                <div className="flex justify-between mb-4">
-                  <span className="text-sm">{job.postedDate}</span>
-                  {job.bookmarked ? (
-                    <BookmarkFilled className="w-4 h-4 text-black" />
-                  ) : (
-                    <Bookmark className="w-4 h-4" />
-                  )}
-                </div>
-                <div className="mb-2">
-                  <div className="text-sm">{job.company}</div>
-                  <h3 className="text-xl font-bold">{job.title}</h3>
-                </div>
-                <div className="absolute right-4 top-16">
-                  <div
-                    className={`w-10 h-10 ${job.logoBackground} rounded-full flex items-center justify-center ${job.logoTextColor}`}
-                  >
-                    {job.logoContent}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 my-4">
-                  {job.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-white px-3 py-1 rounded-full text-xs"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex justify-between items-end mt-4">
-                  <div>
-                    <div className="font-bold">{job.salary}</div>
-                    <div className="text-xs">{job.location}</div>
-                  </div>
-                  <button className="bg-black text-white px-4 py-2 rounded-full text-sm" onClick={() => openJobDetails(job)}>
-                    Details
-                  </button>
-                </div>
-              </div>
+                job={job}
+                colorIndex={index}
+                onEdit={() => openEditJob(job)}
+                onDetails={() => openJobDetails(job)}
+              />
             ))}
           </div>
         </div>
