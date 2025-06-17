@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function PostJobPopup({ isPopupOpen, closePopup }) {
+export default function PostJobPopup({ isPopupOpen, closePopup, onJobSubmit }) {
   const [formData, setFormData] = useState({
     jobTitle: "",
     company: "",
@@ -22,6 +22,7 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
 
   const [errors, setErrors] = useState({});
   const [animationClass, setAnimationClass] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isPopupOpen) {
@@ -95,7 +96,7 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log("Form submission attempted");
@@ -106,13 +107,19 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
       return;
     }
 
-    // Process form data here
-    console.log("Job posting submitted successfully:", formData);
+    setIsSubmitting(true);
 
-    // Here you would typically send data to your backend
-    // addJobToList(formData); // If you want to add to job listings
-
-    closePopup();
+    try {
+      // Call the parent component's submit handler
+      await onJobSubmit(formData);
+      console.log("Job posting submitted successfully:", formData);
+    } catch (error) {
+      console.error("Error submitting job:", error);
+      // You might want to show an error message to the user
+      setErrors({ submit: "Failed to submit job. Please try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isPopupOpen) return null;
@@ -135,6 +142,7 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
           <button
             onClick={closePopup}
             className="absolute top-4 right-4 p-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-full transition-all duration-200"
+            disabled={isSubmitting}
           >
             <X className="w-5 h-5" />
           </button>
@@ -154,6 +162,13 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Submit Error */}
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-red-600 text-sm">{errors.submit}</p>
+            </div>
+          )}
+
           {/* Job Title */}
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
@@ -165,9 +180,10 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
               name="jobTitle"
               value={formData.jobTitle}
               onChange={handleInputChange}
+              disabled={isSubmitting}
               className={`w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400 ${
                 errors.jobTitle ? "border-red-500" : "border-gray-200"
-              }`}
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
               placeholder="Senior Frontend Developer"
             />
             {errors.jobTitle && (
@@ -186,9 +202,10 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
               name="company"
               value={formData.company}
               onChange={handleInputChange}
+              disabled={isSubmitting}
               className={`w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400 ${
                 errors.company ? "border-red-500" : "border-gray-200"
-              }`}
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
               placeholder="Your company name"
             />
             {errors.company && (
@@ -208,7 +225,10 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400"
+                disabled={isSubmitting}
+                className={`w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400 ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 placeholder="New York, NY"
               />
             </div>
@@ -222,7 +242,10 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
                 name="employmentType"
                 value={formData.employmentType}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all cursor-pointer"
+                disabled={isSubmitting}
+                className={`w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all cursor-pointer ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 <option>Full-time</option>
                 <option>Part-time</option>
@@ -245,7 +268,10 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
                 name="salaryMin"
                 value={formData.salaryMin}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400"
+                disabled={isSubmitting}
+                className={`w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400 ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 placeholder="80,000"
               />
               <input
@@ -253,9 +279,10 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
                 name="salaryMax"
                 value={formData.salaryMax}
                 onChange={handleInputChange}
+                disabled={isSubmitting}
                 className={`w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400 ${
                   errors.salaryMax ? "border-red-500" : "border-gray-200"
-                }`}
+                } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                 placeholder="120,000"
               />
             </div>
@@ -274,9 +301,10 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
+              disabled={isSubmitting}
               className={`w-full px-4 py-3 bg-gradient-to-br from-white to-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent focus:shadow-lg transition-all placeholder-gray-400 resize-none ${
                 errors.description ? "border-red-500" : "border-gray-200"
-              }`}
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
               rows="4"
               placeholder="Describe the role, responsibilities, requirements..."
             ></textarea>
@@ -290,15 +318,21 @@ export default function PostJobPopup({ isPopupOpen, closePopup }) {
             <button
               type="button"
               onClick={closePopup}
-              className="flex-1 px-4 py-3 text-gray-700 font-medium bg-gradient-to-r from-gray-50 to-white border border-gray-300 rounded-lg hover:from-gray-100 hover:to-gray-50 hover:shadow-md transition-all duration-200"
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-3 text-gray-700 font-medium bg-gradient-to-r from-gray-50 to-white border border-gray-300 rounded-lg hover:from-gray-100 hover:to-gray-50 hover:shadow-md transition-all duration-200 ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-black to-gray-800 text-white font-medium rounded-lg hover:from-gray-800 hover:to-gray-900 hover:shadow-xl transition-all duration-200 shadow-lg"
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-3 bg-gradient-to-r from-black to-gray-800 text-white font-medium rounded-lg hover:from-gray-800 hover:to-gray-900 hover:shadow-xl transition-all duration-200 shadow-lg ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Post Job
+              {isSubmitting ? "Posting..." : "Post Job"}
             </button>
           </div>
         </form>

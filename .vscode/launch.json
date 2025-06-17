@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "HellowdApplication",
+      "request": "launch",
+      "mainClass": "com.vk.hellowd.HellowdApplication",
+      "projectName": "hellowd"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-DemoApplication<hellowd>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.example.demo.DemoApplication",
+      "projectName": "hellowd",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

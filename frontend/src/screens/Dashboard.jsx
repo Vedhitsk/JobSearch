@@ -13,103 +13,130 @@ import {
   X,
   Menu,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import PostJobPopup from "../components/PostJobPopup";
 import JobCard from "../components/JobCard";
 import JobDetailsPopup from "../components/JobDetailsPopup";
 import EditJobPopup from "../components/EditJobPopup";
 import DeleteConfirmationPopup from "../components/DeleteConfirmationPopup";
+import { jobService } from "../services/jobservice";
+import React from "react";
 
 export default function Dashboard() {
-
   // Convert jobListings to state for dynamic updates
-  const [jobListings, setJobListings] = useState([
-    {
-      id: 1,
-      postedDate: "20 May, 2023",
-      company: "Amazon",
-      title: "Senior UI/UX Designer",
-      logoBackground: "bg-black",
-      logoTextColor: "text-white",
-      logoContent: "A",
-      bookmarked: false,
-      tags: ["Part time", "Senior level", "Distant", "Project work"],
-      salary: "$250/hr",
-      location: "San Francisco, CA",
-      bgColor: "bg-orange-100",
-    },
-    {
-      id: 2,
-      postedDate: "18 May, 2023",
-      company: "Google",
-      title: "Product Designer",
-      logoBackground: "bg-blue-500",
-      logoTextColor: "text-white",
-      logoContent: "G",
-      bookmarked: true,
-      tags: ["Full time", "Senior level", "Remote", "Long-term"],
-      salary: "$180/hr",
-      location: "Mountain View, CA",
-      bgColor: "bg-green-100",
-    },
-    {
-      id: 3,
-      postedDate: "15 May, 2023",
-      company: "Microsoft",
-      title: "UX Researcher",
-      logoBackground: "bg-gray-800",
-      logoTextColor: "text-white",
-      logoContent: "M",
-      bookmarked: false,
-      tags: ["Full time", "Mid level", "Hybrid", "Project work"],
-      salary: "$160/hr",
-      location: "Seattle, WA",
-      bgColor: "bg-purple-100",
-    },
-    {
-      id: 4,
-      postedDate: "12 May, 2023",
-      company: "Apple",
-      title: "Visual Designer",
-      logoBackground: "bg-gray-200",
-      logoTextColor: "text-black",
-      logoContent: "A",
-      bookmarked: false,
-      tags: ["Contract", "Senior level", "On-site", "Short-term"],
-      salary: "$200/hr",
-      location: "Cupertino, CA",
-      bgColor: "bg-blue-100",
-    },
-    {
-      id: 5,
-      postedDate: "10 May, 2023",
-      company: "Netflix",
-      title: "Motion Designer",
-      logoBackground: "bg-red-600",
-      logoTextColor: "text-white",
-      logoContent: "N",
-      bookmarked: true,
-      tags: ["Full time", "Senior level", "Remote", "Long-term"],
-      salary: "$220/hr",
-      location: "Los Gatos, CA",
-      bgColor: "bg-pink-100",
-    },
-    {
-      id: 6,
-      postedDate: "8 May, 2023",
-      company: "Spotify",
-      title: "Interaction Designer",
-      logoBackground: "bg-green-600",
-      logoTextColor: "text-white",
-      logoContent: "S",
-      bookmarked: false,
-      tags: ["Part time", "Mid level", "Remote", "Project work"],
-      salary: "$175/hr",
-      location: "New York, NY",
-      bgColor: "bg-gray-100",
-    },
-  ]);
+  // const [jobListings, setJobListings] = useState([
+  //   {
+  //     id: 1,
+  //     postedDate: "20 May, 2023",
+  //     company: "Amazon",
+  //     title: "Senior UI/UX Designer",
+  //     logoBackground: "bg-black",
+  //     logoTextColor: "text-white",
+  //     logoContent: "A",
+  //     bookmarked: false,
+  //     tags: ["Part time", "Senior level", "Distant", "Project work"],
+  //     salary: "$250/hr",
+  //     location: "San Francisco, CA",
+  //     bgColor: "bg-orange-100",
+  //   },
+  //   {
+  //     id: 2,
+  //     postedDate: "18 May, 2023",
+  //     company: "Google",
+  //     title: "Product Designer",
+  //     logoBackground: "bg-blue-500",
+  //     logoTextColor: "text-white",
+  //     logoContent: "G",
+  //     bookmarked: true,
+  //     tags: ["Full time", "Senior level", "Remote", "Long-term"],
+  //     salary: "$180/hr",
+  //     location: "Mountain View, CA",
+  //     bgColor: "bg-green-100",
+  //   },
+  //   {
+  //     id: 3,
+  //     postedDate: "15 May, 2023",
+  //     company: "Microsoft",
+  //     title: "UX Researcher",
+  //     logoBackground: "bg-gray-800",
+  //     logoTextColor: "text-white",
+  //     logoContent: "M",
+  //     bookmarked: false,
+  //     tags: ["Full time", "Mid level", "Hybrid", "Project work"],
+  //     salary: "$160/hr",
+  //     location: "Seattle, WA",
+  //     bgColor: "bg-purple-100",
+  //   },
+  //   {
+  //     id: 4,
+  //     postedDate: "12 May, 2023",
+  //     company: "Apple",
+  //     title: "Visual Designer",
+  //     logoBackground: "bg-gray-200",
+  //     logoTextColor: "text-black",
+  //     logoContent: "A",
+  //     bookmarked: false,
+  //     tags: ["Contract", "Senior level", "On-site", "Short-term"],
+  //     salary: "$200/hr",
+  //     location: "Cupertino, CA",
+  //     bgColor: "bg-blue-100",
+  //   },
+  //   {
+  //     id: 5,
+  //     postedDate: "10 May, 2023",
+  //     company: "Netflix",
+  //     title: "Motion Designer",
+  //     logoBackground: "bg-red-600",
+  //     logoTextColor: "text-white",
+  //     logoContent: "N",
+  //     bookmarked: true,
+  //     tags: ["Full time", "Senior level", "Remote", "Long-term"],
+  //     salary: "$220/hr",
+  //     location: "Los Gatos, CA",
+  //     bgColor: "bg-pink-100",
+  //   },
+  //   {
+  //     id: 6,
+  //     postedDate: "8 May, 2023",
+  //     company: "Spotify",
+  //     title: "Interaction Designer",
+  //     logoBackground: "bg-green-600",
+  //     logoTextColor: "text-white",
+  //     logoContent: "S",
+  //     bookmarked: false,
+  //     tags: ["Part time", "Mid level", "Remote", "Project work"],
+  //     salary: "$175/hr",
+  //     location: "New York, NY",
+  //     bgColor: "bg-gray-100",
+  //   },
+  // ]);
+
+  const [jobListings, setJobListings] = useState([]);
+
+  useEffect(() => {
+    loadJobs();
+  }, []);
+
+  const loadJobs = async () => {
+    try {
+      const jobs = await jobService.getAllJobs();
+      setJobListings(jobs);
+    } catch (error) {
+      console.error("Failed to load jobs:", error);
+    }
+  };
+
+  // Update PostJobPopup to call the API
+  const handleJobSubmit = async (jobData) => {
+    try {
+      const newJob = await jobService.createJob(jobData);
+      setJobListings((prev) => [...prev, newJob]);
+      closePopup();
+    } catch (error) {
+      console.error("Failed to create job:", error);
+    }
+  };
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPostJobPopupOpen, setIsPostJobPopupOpen] = useState(false);
@@ -117,7 +144,6 @@ export default function Dashboard() {
   const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
   const [isEditJobOpen, setIsEditJobOpen] = useState(false);
-
 
   const [deletingJob, setDeletingJob] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -169,7 +195,12 @@ export default function Dashboard() {
   };
 
   const openDeleteConfirm = (job) => {
-    console.log("Opening delete confirmation for job:", job.title, "ID:", job.id);
+    console.log(
+      "Opening delete confirmation for job:",
+      job.title,
+      "ID:",
+      job.id
+    );
     setDeletingJob(job);
     setIsDeleteConfirmOpen(true);
   };
@@ -184,9 +215,9 @@ export default function Dashboard() {
     if (deletingJob) {
       console.log("Deleting job with ID:", deletingJob.id);
       console.log("Deleted job data:", deletingJob);
-      
-      setJobListings(jobListings.filter(job => job.id !== deletingJob.id));
-      
+
+      setJobListings(jobListings.filter((job) => job.id !== deletingJob.id));
+
       console.log("Job deleted successfully!");
       closeDeleteConfirm();
     }
@@ -200,6 +231,7 @@ export default function Dashboard() {
         <PostJobPopup
           isPopupOpen={isPostJobPopupOpen}
           closePopup={closePopup}
+          onJobSubmit={handleJobSubmit}
         />
       )}
 
